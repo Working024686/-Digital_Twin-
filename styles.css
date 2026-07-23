@@ -1,0 +1,219 @@
+:root{
+    --bg:#12161D;
+    --panel:#171C25;
+    --card:#1C222C;
+    --text:#D7DEE7;
+    --text-dim:#7C8494;
+    --primary:#4DA3FF;
+    --success:#22C55E;
+    --warning:#E8A23D;
+    --border: rgba(255,255,255,0.07);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:var(--bg); color:var(--text);
+    font-family: "Inter","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  }
+  #app{
+    display:grid;
+    grid-template-rows:auto 1fr;
+    height:100vh;
+    gap:10px;
+    padding:10px;
+  }
+
+  /* ---------- Status Bar ---------- */
+  .status-bar{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 16px;
+    display:flex;
+    align-items:center;
+    gap:22px;
+    font-size:13px;
+    color:var(--text-dim);
+  }
+  .status-bar .title{
+    font-size:14px; font-weight:600; color:var(--text); margin-right:6px;
+  }
+  .status-bar .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--success);
+    display:inline-block; margin-right:6px;
+    box-shadow:0 0 6px var(--success);
+  }
+  .status-bar .val{ color:var(--text); font-weight:600; }
+  .status-bar .spacer{ flex:1; }
+  .status-bar .time{ color:var(--text-dim); font-variant-numeric: tabular-nums; }
+  .status-bar .menu-btn{
+    background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;
+    padding:4px 8px; border-radius:6px;
+  }
+  .status-bar .menu-btn:hover{ background:var(--card); color:var(--text); }
+
+  /* ---------- Main Grid ---------- */
+  .main-grid{
+    display:grid;
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: 1fr;   /* 關鍵修正：沒有這行，隱式列會依內容高度塌陷，3D 畫布拿到 0 高度 */
+    gap:10px;
+    min-height:0;
+    height:100%;
+    position:relative;         /* 讓 Event Log overlay 用絕對定位覆蓋在這個容器內 */
+    overflow: hidden;          /* 防止收攏的 Event Log 產生水平滾動條或擠壓版面 */
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    display:flex; flex-direction:column;
+    min-height:0;
+  }
+  .panel-header{
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:13px; font-weight:600;
+  }
+  .panel-body{ flex:1; min-height:0; position:relative; }
+
+  /* ---------- Viewport (Three.js) ---------- */
+  #viewport-panel canvas{ display:block; width:100%; height:100%; }
+  .viewport-hint{
+    position:absolute; left:12px; bottom:12px;
+    font-size:11px; color:var(--text-dim);
+    background:rgba(21,26,35,0.7); padding:4px 8px; border-radius:6px;
+    pointer-events:none;
+  }
+
+  /* ---------- Right Column ---------- */
+  .right-col{
+    display:flex; flex-direction:column; gap:10px; min-height:0;
+  }
+  .camera-panel{ flex:0 0 220px; }
+  .camera-select{
+    background:var(--card); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; font-size:12px; padding:4px 8px; cursor:pointer;
+  }
+  .camera-feed{
+    width:100%; height:100%;
+    background: radial-gradient(circle at 30% 30%, #232b38, #0c0f14 80%);
+    position:relative; overflow:hidden;
+    border-radius:0 0 10px 10px;
+    display:flex;
+  }
+  .camera-feed canvas{
+    flex:1; width:100%; height:100%;
+  }
+  .camera-feed .scan-line{
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity:0.35;
+    animation: scan 3s linear infinite;
+    z-index:10;
+    pointer-events:none;
+  }
+  @keyframes scan{ 0%{top:0%} 100%{top:100%} }
+  .camera-feed .label{
+    position:absolute; right:10px; bottom:8px; font-size:10px; color:var(--text-dim);
+    z-index:20;
+    pointer-events:none;
+    opacity: 0.7;
+  }
+
+  .trend-panel{ flex:1; min-height:0; }
+  .trend-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:1px;
+    background:var(--border);
+    height:100%;
+  }
+  .trend-card{
+    background:var(--card); padding:10px 12px;
+    display:flex; flex-direction:column; gap:4px; min-height:0;
+  }
+  .trend-card .row{ display:flex; align-items:baseline; justify-content:space-between; }
+  .trend-card .label{ font-size:11px; color:var(--text-dim); }
+  .trend-card .value{ font-size:18px; font-weight:700; }
+  .trend-card canvas{ flex:1; width:100%; min-height:0; }
+  .legend{ display:flex; gap:8px; font-size:10px; color:var(--text-dim); }
+  .legend .sw{ display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:3px; vertical-align:middle; }
+
+  /* ---------- Route Config Button ---------- */
+  .route-btn{
+    background:var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:10px 14px; color:var(--text-dim); font-size:12px; font-weight:600;
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:not-allowed; opacity:0.6;
+  }
+
+  /* ---------- Event Log — Overlay Sidebar ----------
+     需求：能完整收攏（collapsed 時完全不佔版面、不影響左側 3D 固定尺寸），
+     展開時以浮層形式蓋住右側 Camera / Trend 欄位。 */
+  .eventlog-panel{
+    position:absolute;
+    top:0; right:0; bottom:0;
+    width:320px;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.35);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform .22s ease, visibility .22s ease;
+    z-index:30;
+    pointer-events:auto;
+  }
+  .eventlog-panel.open{
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .eventlog-panel .panel-header{ color:var(--warning); }
+  .eventlog-toggle{
+    background:none;border:none;color:var(--warning);cursor:pointer;font-size:14px;
+    padding:2px 6px; border-radius:6px;
+  }
+  .eventlog-toggle:hover{ background:var(--card); }
+
+  /* 常駐開關 tab：調整 top 為 60px 避免遮擋 Camera Header */
+  .eventlog-tab{
+    position:absolute; top:60px; right:0;
+    background:var(--card); border:1px solid var(--border); border-right:none;
+    color:var(--warning); font-size:12px; font-weight:600;
+    padding:8px 6px; border-radius:8px 0 0 8px;
+    cursor:pointer; z-index:31;
+    writing-mode: vertical-rl;
+    display:flex; align-items:center; gap:6px;
+  }
+  .eventlog-tab:hover{ background:var(--panel); }
+  .eventlog-panel.open ~ .eventlog-tab{ display:none; }
+
+  .event-list{ overflow-y:auto; height:100%; padding:6px 10px; }
+  .event-item{ display:flex; gap:10px; padding:8px 2px; border-bottom:1px solid var(--border); }
+  .event-item .dot{ width:8px;height:8px;border-radius:50%; margin-top:5px; flex:none; }
+  .event-item .time{ font-size:11px; color:var(--text-dim); white-space:nowrap; }
+  .event-item .title{ font-size:12px; font-weight:600; }
+  .event-item .desc{ font-size:11px; color:var(--text-dim); }
+  .eventlog-filter{
+    padding:8px 10px; border-top:1px solid var(--border);
+    font-size:11px; color:var(--text-dim);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .eventlog-filter select{
+    background:var(--card); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; font-size:11px; padding:3px 6px;
+  }
+
+  .camera-select {
+    background: var(--card, #161b22);
+    color: var(--text, #c9d1d9);
+    border: 1px solid var(--border, #30363d);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+  }
+  .camera-select:hover {
+    border-color: var(--primary, #58a6ff);
+  }

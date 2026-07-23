@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Twin Viewer — Robot Cell Monitor</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232563eb' width='100' height='100'/><circle cx='50' cy='50' r='30' fill='%23fff'/></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div id="app">
+    <div class="status-bar" id="statusBar">
+      <span class="title">System Status</span>
+      <span><span class="dot" id="onlineDot"></span><span id="onlineText">Online</span></span>
+      <span>Robot: <span class="val" id="robotMode">RUNNING</span></span>
+      <span>State: <span class="val" id="robotState">SCANNING</span></span>
+      <span>Cycle: <span class="val" id="cycleCount">1234</span></span>
+      <span>Latency: <span class="val" id="latencyVal">28ms</span></span>
+      <span>FPS: <span class="val" id="fpsVal">60</span></span>
+      <span class="spacer"></span>
+      <span class="time" id="clock">--:--:--</span>
+      <button class="menu-btn" title="更多選項">☰</button>
+    </div>
+
+    <div class="main-grid">
+      <div class="panel" id="viewport-panel">
+        <div class="panel-body">
+          <!-- <div id="viewport-hint" class="viewport-hint">拖曳旋轉 · 滾輪縮放</div> -->
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="panel camera-panel">
+          <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Camera Feed</span>
+            <select id="cameraSelect" class="camera-select">
+              <option value="global">Global Camera</option>
+              <option value="onhand" selected>On-Hand Camera</option>
+            </select>
+          </div>
+          <div class="panel-body">
+            <div class="camera-feed" style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+              <canvas id="cameraCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
+              <canvas id="cameraHudCanvas"
+                style="position: absolute; top:0; left:0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+              <div class="scan-line"></div>
+              <!-- <div class="label" id="cameraLabel">On-Hand Camera（末端第一人稱視角）</div > -->
+            </div>
+          </div>
+        </div>
+
+        <div class="panel trend-panel">
+          <div class="panel-header">Realtime Trend</div>
+          <div class="panel-body">
+            <div class="trend-grid">
+              <div class="trend-card">
+                <div class="row"><span class="label">Speed (mm/s)</span><span class="value" id="speedVal">--</span>
+                </div>
+                <canvas id="chartSpeed"></canvas>
+              </div>
+              <div class="trend-card">
+                <div class="row"><span class="label">Accel. (mm/s²)</span><span class="value" id="accelVal">--</span>
+                </div>
+                <canvas id="chartAccel"></canvas>
+              </div>
+              <div class="trend-card">
+                <div class="row"><span class="label">Vibration (g)</span><span class="value" id="vibVal">--</span></div>
+                <canvas id="chartVib"></canvas>
+              </div>
+              <div class="trend-card">
+                <div class="row">
+                  <span class="label">Motor Temp / Current</span>
+                  <span class="legend">
+                    <span><span class="sw" style="background:var(--warning)"></span>Temp</span>
+                    <span><span class="sw" style="background:var(--success)"></span>Curr.</span>
+                  </span>
+                </div>
+                <canvas id="chartMotor"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="route-btn" title="Phase 2 功能，尚未啟用">
+          <span>⚙ Route Configuration</span>
+          <span>›</span>
+        </div>
+      </div>
+
+      <div class="panel eventlog-panel" id="eventlogPanel">
+        <div class="panel-header">
+          Event Log
+          <button class="eventlog-toggle" id="eventlogToggle">收合 ✕</button>
+        </div>
+        <div class="panel-body">
+          <div class="event-list" id="eventList"></div>
+        </div>
+        <div class="eventlog-filter">
+          <span>Filter</span>
+          <select id="eventFilter">
+            <option value="all">All</option>
+            <option value="state">State</option>
+            <option value="system">System</option>
+            <option value="alarm">Alarm</option>
+          </select>
+        </div>
+      </div>
+      <button class="eventlog-tab" id="eventlogTab">▤ Event Log</button>
+    </div>
+  </div>
+
+  <!-- Use unpkg builds (serve correct JS MIME and examples UMD) -->
+  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

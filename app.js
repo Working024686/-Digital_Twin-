@@ -118,7 +118,7 @@ const RobotFSM = (() => {
       case "ARRIVING":
         return { joints: [0, -10, -95, 0, -70, 0], desc: "Approaching Workpiece" };
       case "SCANNING":
-        return { joints: [0, -5, -95, 0, -65, 0], desc: "Scanning Workpiece at Station" };
+        return { joints: [0, -3, -95, 0, -65, 0], desc: "Scanning Workpiece at Station" };
       case "DEPARTING":
         return { joints: [0, -10, -85, 0, -60, 0], desc: "Lifting & Releasing" };
       case "WAIT_NEXT":

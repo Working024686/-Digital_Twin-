@@ -1,0 +1,723 @@
+﻿/* =====================================================================
+   Digital Twin Monitor — styles.css
+   響應式雙模式佈局 + 低對比配色系統  v2（優化排版）
+   ===================================================================== */
+
+/* ─── 1. 設計 Token (Low Contrast Palette) ─────────────────────────── */
+:root {
+  --bg: #181B20;
+  --panel: #1D2027;
+  --card: #22262E;
+  --surface: #272B34;
+  --text: #B4BAC6;
+  --text-dim: #636B78;
+  --text-muted: #434A56;
+  --primary: #5A8FCC;
+  --success: #48986A;
+  --warning: #B07E38;
+  --danger: #9E4A4A;
+  --border: rgba(255, 255, 255, 0.045);
+  --border-soft: rgba(255, 255, 255, 0.07);
+  --radius: 9px;
+  --gap: 7px;
+  --font-ui: "Inter", "PingFang TC", "Noto Sans TC", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}
+
+/* ─── 2. Reset ──────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ─── 3. App 根容器 ─────────────────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100dvh;
+  /* dvh 在手機上更精準 */
+  padding: var(--gap);
+  gap: var(--gap);
+  overflow: hidden;
+}
+
+/* ─── 4. Status Bar ─────────────────────────────────────────────────── */
+.status-bar {
+  flex: 0 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 0 14px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-dim);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.status-bar .title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.status-bar .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.status-bar .val {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.status-bar .spacer {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.status-bar .time {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.status-bar .menu-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px 7px;
+  border-radius: 5px;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.status-bar .menu-btn:hover {
+  background: var(--card);
+  color: var(--text);
+}
+
+/* 中等視窗（< 900px）隱藏次要 Status Bar 欄位 */
+@media (max-width: 900px) {
+
+  .status-bar .latency-item,
+  .status-bar .fps-item {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+
+  .status-bar .robot-item,
+  .status-bar .state-item,
+  .status-bar .cycle-item {
+    display: none;
+  }
+}
+
+/* ─── 5. Main Grid 容器 ─────────────────────────────────────────────── */
+.main-grid {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── 6. 3D Viewport ────────────────────────────────────────────────── */
+#viewport-panel {
+  aspect-ratio: 1 / 1;
+  height: 100%;
+  width: auto;
+  flex: 0 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* 橫向 (Landscape) 時套用 1.5 倍寬度，並依裝置寬度設定不同的寬度上限 */
+@media (orientation: landscape) {
+  #viewport-panel {
+    aspect-ratio: 1.5 / 1;
+  }
+}
+
+/* 手機橫向（寬度 ≤ 900px）：viewport 最寬不超過畫面的 60% */
+@media (orientation: landscape) and (max-width: 900px) {
+  #viewport-panel {
+    max-width: 60vw;
+  }
+}
+
+/* 電腦／桌面橫向（寬度 > 900px）：viewport 最寬不超過畫面的 70% */
+@media (orientation: landscape) and (min-width: 901px) {
+  #viewport-panel {
+    max-width: 70vw;
+  }
+}
+
+#viewport-panel .panel-body {
+  flex: 1 1 0;
+  min-height: 0;
+  position: relative;
+}
+
+#viewport-panel canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ─── 7. 右側欄 ─────────────────────────────────────────────────────── */
+.right-col {
+  flex: 1 1 0;
+  min-width: 200px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  overflow: hidden;
+}
+
+/* ─── 8. 面板通用 ───────────────────────────────────────────────────── */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel-header {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.panel-body {
+  flex: 1 1 0;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── 9. Camera Feed ─────────────────────────────────────────────────  */
+/* 比例：Camera 佔右欄 40%，Trend 佔其餘 */
+.camera-panel {
+  flex: 0 0 40%;
+  min-height: 120px;
+}
+
+.camera-select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.camera-select:hover {
+  border-color: var(--primary);
+}
+
+.camera-feed {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0d1018;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius) var(--radius);
+  display: flex;
+}
+
+.camera-feed canvas {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.camera-feed .scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, var(--primary) 50%, transparent 90%);
+  opacity: 0.18;
+  animation: scan 5s linear infinite;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  0% {
+    top: 0%
+  }
+
+  100% {
+    top: 100%
+  }
+}
+
+/* ─── 10. Realtime Trend ─────────────────────────────────────────────── */
+.trend-panel {
+  flex: 1 1 0;
+  min-height: 80px;
+}
+
+.trend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  height: 100%;
+}
+
+.trend-card {
+  background: var(--card);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trend-card .row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex: 0 0 auto;
+}
+
+.trend-card .label {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.trend-card .value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.trend-card canvas {
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+  display: block;
+}
+
+.legend {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.legend .sw {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  margin-right: 2px;
+  vertical-align: middle;
+}
+
+/* ─── 11. Route Config ──────────────────────────────────────────────── */
+.route-btn {
+  flex: 0 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 12px;
+  color: var(--text-muted);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* 直向模式專用的 Route Configuration 按鈕，預設（橫向）隱藏，
+   避免和桌面版 right-col 內的按鈕同時出現 */
+.mobile-route-btn {
+  display: none;
+}
+
+/* ─── 12. Event Log Overlay ─────────────────────────────────────────── */
+.eventlog-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 300px;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.3);
+  transform: translateX(110%);
+  visibility: hidden;
+  transition: transform .22s cubic-bezier(.4, 0, .2, 1), visibility .22s;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+}
+
+.eventlog-panel.open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.eventlog-panel .panel-header {
+  color: var(--warning);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+
+.eventlog-toggle {
+  background: none;
+  border: none;
+  color: var(--warning);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.eventlog-toggle:hover {
+  background: var(--card);
+}
+
+.eventlog-tab {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-right: none;
+  color: var(--warning);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 8px 5px;
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+  z-index: 31;
+  writing-mode: vertical-rl;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.05em;
+}
+
+.eventlog-tab:hover {
+  background: var(--surface);
+}
+
+.eventlog-panel.open~.eventlog-tab {
+  display: none;
+}
+
+.event-list {
+  overflow-y: auto;
+  height: 100%;
+  padding: 4px 8px;
+}
+
+.event-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--border);
+}
+
+.event-item .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex: none;
+}
+
+.event-item .time {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+.event-item .title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.event-item .desc {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+.eventlog-filter {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eventlog-filter select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 10px;
+  padding: 2px 4px;
+}
+
+/* ─── 13. Portrait 手機 Tab 區 ──────────────────────────────────────── */
+.mobile-tabs {
+  display: none;
+  flex: 1 1 0;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.mobile-tab-bar {
+  flex: 0 0 auto;
+  display: flex;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+}
+
+.mobile-tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.mobile-tab-pane {
+  display: none;
+  flex: 1 1 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  /* 新增：確保切頁面板伸展填滿 */
+}
+
+.mobile-tab-pane.active {
+  display: flex;
+}
+
+.mobile-tab-pane .panel-header {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+
+/* 修正重點：解除固定 40% 比例限制，強制讓 Camera 在 Mobile 滿版 */
+.mobile-tab-pane .camera-panel {
+  flex: 1 1 0 !important;
+  height: 100%;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.mobile-tab-pane .trend-panel {
+  flex: 1 1 0 !important;
+  height: 100%;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* 確保 Camera Feed 與內部的 Canvas / Video 能正確延伸 */
+.camera-panel .panel-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  background: #0d1018;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius) var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-feed canvas,
+.camera-feed video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  /* 確保影像不變形，等比例適應 */
+}
+
+/* ─── 14. 直向 (Portrait) 響應式 ────────────────────────────────────── */
+@media (orientation: portrait) {
+  .main-grid {
+    flex-direction: column;
+  }
+
+  /* 直向模式：維持 1/1 正方形，最大高度不超過 46vh */
+  #viewport-panel {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    flex: 0 0 auto;
+    max-height: 46vh;
+  }
+
+  .right-col {
+    display: none;
+  }
+
+  .mobile-tabs {
+    display: flex;
+  }
+
+  /* 直向模式已由 mobile-tabs 的 Events 分頁提供事件紀錄，
+     隱藏橫向專用的滑出式事件紀錄抽屜與其開關按鈕，避免雙重顯示 */
+  .eventlog-panel,
+  .eventlog-tab {
+    display: none !important;
+  }
+
+  /* 直向模式：桌面版 right-col 隱藏後 Route Configuration 隨之消失，
+     改為顯示直向模式專用的同款按鈕，補回「›」頁跳入口 */
+  .mobile-route-btn {
+    display: flex;
+  }
+
+  /* 🎯 手機頁籤切換面板機制 */
+  .mobile-pane {
+    display: none;
+    /* 預設隱藏非當前分頁 */
+    width: 100%;
+    flex: 1;
+  }
+
+  .mobile-pane.active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 確保直向模式下，Camera Feed 容器具備足夠高寬 */
+  .camera-feed-container,
+  #mobile-pane-camera .camera-feed {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    /* 或 flex: 1 填滿分頁空間 */
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* 手機 status bar 精簡 */
+  .status-bar {
+    gap: 10px;
+    padding: 0 10px;
+    height: 34px;
+  }
+}
+
+/* ─── 15. 極小螢幕 ───────────────────────────────────────────────────── */
+@media (max-width: 420px) {
+  :root {
+    --gap: 5px;
+  }
+
+  #app {
+    padding: 5px;
+  }
+
+  .status-bar {
+    font-size: 11px;
+    height: 32px;
+    gap: 8px;
+    padding: 0 8px;
+  }
+}
